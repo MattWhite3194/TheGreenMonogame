@@ -22,7 +22,7 @@ The project was written in Microsoft's Visual Studio IDE.
 
 ## Progress
 
-**Collisions, Inventory, and the Player:**
+### Collisions, Inventory, and the Player:  
 
 **Notes:**  
 Added basic classes to the game including an entity, player, and world.  
@@ -49,7 +49,8 @@ Tiles store a tilestate, which is a one byte state representing if it's merged w
 These tilestates map to a dictionary of texture atlases  
 Example: A dirt block with no surrounding tiles will return tilestate 0, A dirt block with a tile above it will return tilestate 1, etc...  
 The binary representation of the tiles it is touching is seen below:  
-![alt text](TheGreen/TheGreenProgressPhotos/TileStates.png?raw=true)
+![alt text](TheGreen/TheGreenProgressPhotos/TileStates.png?raw=true)  
+
 The tilestate is retrieved by summing these values, corners are only added if both touching edges are both active, otherwise, they are ignored.  
 Created a flood fill lighting algorithm that draws to the screen.  
 There are now item classes in the game, with each one having a unique UseItem funtion.  
