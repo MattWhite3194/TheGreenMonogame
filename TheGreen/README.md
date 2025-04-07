@@ -1,4 +1,4 @@
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/Cover.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/Cover.png "Logo Title Text 1")
 
 **About**
 The Green is a 2D sanbox game where players can explore a 2d randomly generated world.
@@ -6,13 +6,13 @@ Players can build, fight, and explore a fully destructable tile world.
 
 **Game Showcase**
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/GameShowCaseEnemies.gif "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/GameShowCaseEnemies.gif "Logo Title Text 1")
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/GameShowCaseTiles.gif "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/GameShowCaseTiles.gif "Logo Title Text 1")
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/GameShowCaseChests.gif "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/GameShowCaseChests.gif "Logo Title Text 1")
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/GameShowCaseWater.gif "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/GameShowCaseWater.gif "Logo Title Text 1")
 
 **Technical**
 The Green was built using the opensource Monogame framework, which is a reimplementation of Microsoft's XNA game framework.
@@ -31,7 +31,7 @@ Created an input handler that sends out input events to any objects marked as an
 
 World Generation:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/WorldGeneration.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/WorldGeneration.png "Logo Title Text 1")
 
 Notes: 
 The terrain is generated using a 1D simple noise algorithm.
@@ -40,7 +40,7 @@ The map is saved as a png image, each pixel mapping to a tile.
 
 Textures, Lighting, and Items:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/TexturesLightingItems.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/TexturesLightingItems.png "Logo Title Text 1")
 
 Notes:
 The player and tiles now have textures, and tiles merge with other tiles around them.
@@ -48,14 +48,14 @@ Tiles store a tilestate, which is a one byte state representing if it's merged w
 These tilestates map to a dictionary of texture atlases
 Example: A dirt block with no surrounding tiles will return tilestate 0, A dirt block with a tile above it will return tilestate 1, etc...
 The binary representation of the tiles it is touching is seen below:
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/TileStates.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/TileStates.png "Logo Title Text 1")
 The tilestate is retrieved by summing these values, corners are only added if both touching edges are both active, otherwise, they are ignored.
 Created a flood fill lighting algorithm that draws to the screen.
 There are now item classes in the game, with each one having a unique UseItem funtion.
 
 Parallax Backgrounds:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/ParallaxBackgrounds.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/ParallaxBackgrounds.png "Logo Title Text 1")
 
 Notes:
 Created parallax background objects, which scroll with the players movement, and fill the entire screen.
@@ -63,7 +63,7 @@ Not the best artist, Hence the pixel art.
 
 Dynamic Lighting and tile checks:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/DynamicLightingTileChecks.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/DynamicLightingTileChecks.png "Logo Title Text 1")
 
 Notes: 
 The lighting algorithm can now handle per frame lighting updates, so things like torches, or flares that move will light tiles.
@@ -76,9 +76,9 @@ The database is accessed by the tile ID, and it holds methods and properties of 
 
 New Lighting Algorithm, Tile Entities, Chests, and Water:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/NewLighting.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/NewLighting.png "Logo Title Text 1")
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/TileEntitiesChestsWater.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/TileEntitiesChestsWater.png "Logo Title Text 1")
 
 Notes:
 New lighting algorithm using an iterative approach, with light blurring across a 2d grid.
@@ -89,7 +89,7 @@ Interactable tiles and inventory tiles were added. Tiles can have a custom inven
 
 Enemies and Item collisions:
 
-![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreenProgressPhotos/EnemiesAndItemCollisions.png "Logo Title Text 1")
+![alt text](https://github.com/MattWhite3194/TheGreenMonogame/tree/master/TheGreen/TheGreenProgressPhotos/EnemiesAndItemCollisions.png "Logo Title Text 1")
 
 Notes: 
 Enemies were added to the game, with animation and behavior components for composition and easier implementation of new enemies.
