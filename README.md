@@ -24,6 +24,8 @@ The project was written in Microsoft's Visual Studio IDE.
 
 ### Collisions, Inventory, and the Player:  
 
+![alt text](TheGreen/TheGreenProgressPhotos/CollisionsInventoryPlayer.png?raw=true)
+
 **Notes:**  
 Added basic classes to the game including an entity, player, and world.  
 Working on handling tile-based collisions.  
