@@ -6,6 +6,7 @@ using System.Timers;
 using TheGreen.Game.Entities.NPCs;
 using TheGreen.Game.Input;
 using TheGreen.Game.Inventory;
+using TheGreen.Game.Tiles;
 using TheGreen.Game.UIComponents;
 using TheGreen.Game.WorldGeneration;
 
@@ -27,6 +28,7 @@ namespace TheGreen.Game.Entities
         private Timer _respawnTimer;
         private bool invincible = false;
         private bool _dead = false;
+        private HashSet<InputButton> _activeInputs = new HashSet<InputButton>();
         public bool Dead { get { return _dead; } }
         public Player(Texture2D image, InventoryManager inventory, int health) : base(image, default, size: new Vector2(20, 42), animationFrames: new List<(int, int)> { (0, 0), (1, 8), (9, 9), (10, 10) })
         {
@@ -67,29 +69,34 @@ namespace TheGreen.Game.Entities
             if (@event.InputButton == InputButton.Left)
             {
                 if (@event.EventType == InputEventType.KeyDown)
-                    Direction.X -= 1;
+                    _activeInputs.Add(InputButton.Left);
                 else
-                    Direction.X += 1;
+                    _activeInputs.Remove(InputButton.Left);
                 InputManager.MarkInputAsHandled(@event);
             }
             else if (@event.InputButton == InputButton.Right)
             {
                 if (@event.EventType == InputEventType.KeyDown)
-                    Direction.X += 1;
+                    _activeInputs.Add(InputButton.Right);
                 else
-                    Direction.X -= 1;
+                    _activeInputs.Remove(InputButton.Right);
                 InputManager.MarkInputAsHandled(@event);
             }
-            if (Math.Abs(Direction.X) == 2)
-                Direction.X = 0;
             else if (@event.InputButton == InputButton.Jump)
             {
                 _queueJump = @event.EventType == InputEventType.KeyDown;
                 InputManager.MarkInputAsHandled(@event);
             }
+            else if (@event.InputButton == InputButton.RightMouse && @event.EventType == InputEventType.MouseButtonDown)
+            {
+                Point mouseTilePosition = InputManager.GetMouseWorldPosition() / new Point(Globals.TILESIZE);
+                if (TileDatabase.GetTileData(WorldGen.World.GetTileID(mouseTilePosition.X, mouseTilePosition.Y)) is IInteractableTile interactableTile)
+                {
+                    interactableTile.OnRightClick(mouseTilePosition.X, mouseTilePosition.Y);
+                }
+            }
             else
             {
-
                 ItemCollider.HandleInput(@event);
             }
         }
@@ -98,7 +105,9 @@ namespace TheGreen.Game.Entities
         {
             base.Update(delta);
             Vector2 newVelocity = Velocity;
-
+            Direction.X = 0;
+            if (_activeInputs.Contains(InputButton.Left)) Direction.X -= 1;
+            if (_activeInputs.Contains(InputButton.Right)) Direction.X += 1;
             //Slow down player if they stopped moving
             if (Direction.X == 0.0f)
             {
@@ -173,7 +182,7 @@ namespace TheGreen.Game.Entities
             {
                 case CollisionLayer.ItemDrop:
                     ItemDrop itemDrop = (ItemDrop)entity;
-                    if (Inventory.AddItem(itemDrop.GetItem()) == null)
+                    if (Inventory.AddItemToPlayerInventory(itemDrop.GetItem()) == null)
                     {
                         Main.EntityManager.RemoveEntity(itemDrop);
                     }
@@ -184,7 +193,6 @@ namespace TheGreen.Game.Entities
                     ApplyDamage(enemy.Damage);
                     ApplyKnockback(enemy.Position + enemy.Origin);
                     break;
-
             }
         }
         public void ApplyDamage(int damage)
@@ -221,7 +229,9 @@ namespace TheGreen.Game.Entities
             _dead = false;
             Position = WorldGen.World.SpawnTile.ToVector2() * Globals.TILESIZE - new Vector2(0, Size.Y - 1);
             Velocity = Vector2.Zero;
-            Direction = Vector2.Zero;
+            _activeInputs.Clear();
+            ItemCollider.ItemActive = false;
+            _queueJump = false;
             Main.EntityManager.AddEntity(this);
             Main.EntityManager.AddEntity(ItemCollider);
             _health = 100;

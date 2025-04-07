@@ -7,43 +7,22 @@ namespace TheGreen.Game.Inventory
 {
     public class ItemSlot : UIComponent
     {
-        private Item _item;
-        public Item Item 
-        { 
-            get { return _item; } 
-            set 
-            { 
-                _item = value;
-                _quantityLabel.SetText(_item?.Quantity.ToString() ?? "");
-                if (_item == null) return;
-                _itemImagePosition = Position + new Vector2((int)(Size.X - _item.Image.Width) / 2, (int)(Size.Y - _item.Image.Height) / 2);
-            }
-        }
-        private Vector2 _itemImagePosition;
-        private Label _quantityLabel;
-
-        public ItemSlot(Vector2 position, Texture2D image, Color color) : base(position, image, color)
+        public ItemSlot(Vector2 position, Texture2D image, Color color) : base(position, image, color) { }
+        public void DrawItem(SpriteBatch spriteBatch, Item item)
         {
-            _quantityLabel = new Label(Vector2.Zero, "", Vector2.Zero, drawCentered: true, scale: 0.6f);
-        }
+            if (item == null) return;
 
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            base.Draw(spriteBatch);
-            if (_item == null) return;
-
-            spriteBatch.Draw(_item.Image, _itemImagePosition, Color.White);
-
-            if (_item.Stackable)
+            spriteBatch.Draw(
+                item.Image,
+                Position + new Vector2((int)(Size.X - item.Image.Width) / 2, (int)(Size.Y - item.Image.Height) / 2), 
+                Color.White
+                );
+            
+            if (item.Stackable)
             {
-                _quantityLabel.Draw(spriteBatch);
+                spriteBatch.DrawString(ContentLoader.GameFont, item.Quantity + "", Position + new Vector2(Size.X / 2, Size.Y - 10) + new Vector2(0.6f, 0.6f), Color.Black, 0.0f, Vector2.Zero, 0.6f, SpriteEffects.None, 0.0f);
+                spriteBatch.DrawString(ContentLoader.GameFont, item.Quantity + "", Position + new Vector2(Size.X / 2, Size.Y - 10), Color.White, 0.0f, Vector2.Zero, 0.6f, SpriteEffects.None, 0.0f);
             }
-        }
-
-        //Children of this component need to be updated when the grid parent changes this components position
-        protected override void HandlePositionUpdate()
-        {
-            _quantityLabel.Position = Position + new Vector2(Size.X/2, Size.Y - 10);
         }
     }
 }

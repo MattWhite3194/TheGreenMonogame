@@ -1,29 +1,43 @@
 ﻿TODO:
 
 Fixes:
+Drawing order for sprites
+fix item collision with tiles floating downwards
 design better damage system
-Fix tile culling not accounting for dynamic light
-Improve lighting algorithm, takes up most of runtime. possibly change method of drawing light, instead of using a texture
+Implement tile culling
 Fix Damaged tile sprite or change it's logic completely
 finalize water (make it flow better)
+get rid of globals file, it's stupid. move the time stuff either to main or a seperate class called time. move static variables to TheGreen or Main depending on their scope
 
 Features:
 Define Max stack value for each item, and set a default to like 1000 or something
-add equipment
-add tile entities (start with chest and door)
+add equipment (maybe make accessories input handlers, and store them in a list and call them before calling the players input)
+Add doors
 Save the game
 walls
-Add Window resizing
 projectiles
+Ambitious Features:
+Split Screen
 
-maybe make accessories input handlers, and store them in a list and call them before calling the players input
+
 
 
 UI: 
-UI does not disappear, but can't open map or use items / scroll through inventory
 if inventory was open on death, reopen it when you respawn
+draw map to a render target2D the size of the map. 
+Only draw to this render target when the map is updated, and draw the pixels at the coresponding positions.
 
 Drawing Order:
 player and entities draw above tiles, unless bool is set
-item drops draw above all entities
+item drops draw above everything
 player draws above all enemies
+
+Change TileData to abstract, and just implement each one seperately instead of the overriding mess I currently have.
+
+export tileUpdating to UpdateTileFunction in WorldGen, Update tiles when liquid is set, for removal of tiles like grass or torches.
+
+finish UIScaling
+add an enum type for anchors, (topleft, top right, bottom left, bottom right, centered), create matrices for each one of these or a function for getting translated position
+
+Inventory
+all itemslots have transparency

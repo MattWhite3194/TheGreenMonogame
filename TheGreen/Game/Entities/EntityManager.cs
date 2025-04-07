@@ -290,7 +290,7 @@ namespace TheGreen.Game.Entities
         public void AddItemDrop(Item item, Vector2 position, Vector2 velocity = default)
         {
 
-            ItemDrop itemDrop = new ItemDrop(item, position);
+            ItemDrop itemDrop = new ItemDrop(item, position + new Vector2(Globals.TILESIZE / 2 - ItemDrop.ColliderSize.X / 2, 0));
             itemDrop.Velocity = velocity == default ? Vector2.Zero : velocity;
             _entities.Add(itemDrop);
         }

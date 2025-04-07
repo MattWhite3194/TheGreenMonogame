@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using TheGreen.Game.Tiles;
 using TheGreen.Game.WorldGeneration;
 
@@ -17,11 +18,16 @@ namespace TheGreen.Game.Renderer
                 {
                     if (i >= 0 && i < WorldGen.World.WorldSize.X && j >= 0 && j < WorldGen.World.WorldSize.Y)
                     {
-                        //if (WorldGen.World.GetTileLight(i, j) == 0)
-                        //    continue;
                         //TEMPORARY
-                        if (WorldGen.World.GetWallID(i, j) != 0)
-                            TileDatabase.DrawWall(spriteBatch, WorldGen.World.GetWallID(i, j), WorldGen.World.GetWallState(i, j), i, j);
+                        ushort wallID = WorldGen.World.GetWallID(i, j);
+                        if (wallID != 0)
+                        {
+                            Color light = Main.LightEngine.GetLight(i, j);
+                            light.R = (byte)Math.Max(0, light.R - 30);
+                            light.G = (byte)Math.Max(0, light.G - 30);
+                            light.B = (byte)Math.Max(0, light.B - 30);
+                            spriteBatch.Draw(ContentLoader.TileTextures[wallID], new Vector2(i * Globals.TILESIZE, j * Globals.TILESIZE), TileDatabase.GetTileTextureAtlas(255), light);
+                        }
                     }
                 }
             }
@@ -37,7 +43,7 @@ namespace TheGreen.Game.Renderer
                     //Draw all tiles that are not solid in the wall layer
                     if (TileDatabase.TileHasProperty(tileID, TileProperty.Solid) || tileID == 0)
                         continue;
-                    TileDatabase.DrawTile(spriteBatch, tileID, WorldGen.World.GetTileState(i, j), i, j);
+                    TileDatabase.GetTileData(tileID).Draw(spriteBatch, WorldGen.World.GetTileState(i, j), i, j);
                 }
             }
         }
@@ -51,14 +57,12 @@ namespace TheGreen.Game.Renderer
                     ushort tileID = WorldGen.World.GetTileID(i, j);
                     if (!TileDatabase.TileHasProperty(tileID, TileProperty.Solid))
                         continue;
-                    //if (WorldGen.World.GetTileLight(i, j) == 0)
-                    //    continue;
-                    TileDatabase.DrawTile(spriteBatch, tileID, WorldGen.World.GetTileState(i, j), i, j);
+                    TileDatabase.GetTileData(tileID).Draw(spriteBatch, WorldGen.World.GetTileState(i, j), i, j);
                 }
             }
             foreach (Point crackPoint in WorldGen.World.GetMinedTiles().Keys)
             {
-                spriteBatch.Draw(ContentLoader.Cracks, crackPoint.ToVector2() * Globals.TILESIZE, Color.White);
+                spriteBatch.Draw(ContentLoader.Cracks, crackPoint.ToVector2() * Globals.TILESIZE, Main.LightEngine.GetLight(crackPoint.X, crackPoint.Y));
             }
         }
 
@@ -69,7 +73,7 @@ namespace TheGreen.Game.Renderer
                 for (int j = _drawBoxMin.Y; j < _drawBoxMax.Y; j++)
                 {
                     if (WorldGen.World.GetLiquid(i, j) != 0)
-                        spriteBatch.Draw(ContentLoader.LiquidTexture, new Vector2(i * Globals.TILESIZE, j * Globals.TILESIZE), new Color((byte)0, (byte)0, (byte)0, (byte)(255 - (int)(WorldGen.World.GetTileLight(i, j) / 255.0f * Globals.GlobalLight))));
+                        spriteBatch.Draw(ContentLoader.LiquidTexture, new Vector2(i * Globals.TILESIZE, j * Globals.TILESIZE), Main.LightEngine.GetLight(i, j));
                 }
             }
         }
@@ -80,12 +84,11 @@ namespace TheGreen.Game.Renderer
         /// <param name="spriteBatch"></param>
         public void DrawDebug(SpriteBatch spriteBatch)
         {
-            for (int i = 0; i < _drawBoxMax.X - _drawBoxMin.X; i++)
+            for (int i = _drawBoxMin.X; i < _drawBoxMax.X; i++)
             {
-                for (int j = 0; j < _drawBoxMax.Y - _drawBoxMin.Y; j++)
-                {
-                    if (WorldGen.World.GetLiquid(i + _drawBoxMin.X, j + _drawBoxMin.Y) != 0)
-                        spriteBatch.DrawString(ContentLoader.GameFont, WorldGen.World.GetLiquid(i + _drawBoxMin.X, j + _drawBoxMin.Y) + "", new Vector2(i, j) * Globals.TILESIZE, Color.White, 0.0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0.0f);
+                for (int j = _drawBoxMin.Y; j < _drawBoxMax.Y; j++)
+                { 
+                    spriteBatch.DrawString(ContentLoader.GameFont, WorldGen.World.GetTileID(i, j) + "", new Vector2(i, j) * Globals.TILESIZE, Color.White, 0.0f, Vector2.Zero, 0.5f, SpriteEffects.None, 0.0f);
                 }
             }
         }

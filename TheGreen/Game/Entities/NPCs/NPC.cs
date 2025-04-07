@@ -15,31 +15,45 @@ namespace TheGreen.Game.Entities.NPCs
         public string Name;
         private int _health;
         public readonly int Damage;
+        private readonly bool _friendly;
         private INPCBehavior _behavior;
         private Timer _invincibilityTimer;
         private bool _invincible = false;
-        public NPC(int id, string name, Texture2D image, Vector2 size, int health, int damage, bool collidesWithTiles, bool friendly, Type behaviorType, List<(int, int)> animationFrames) : base(image, default, size: size, animationFrames: animationFrames)
+        private List<(int, int)> _animationFrames;
+        public NPC(int id, 
+            string name, 
+            Texture2D image, 
+            Vector2 size, 
+            int health, 
+            int damage, 
+            bool collidesWithTiles, 
+            INPCBehavior behavior,
+            bool drawBehindTiles = false,
+            bool friendly = false,
+            List<(int, int)> animationFrames = null, 
+            CollisionLayer layer = default, 
+            CollisionLayer collidedWith = default) 
+            : base(image, default, size: size, animationFrames: animationFrames)
         {
             ID = id;
             Name = name;
             Damage = damage;
             this._health = health;
             CollidesWithTiles = collidesWithTiles;
-            if (typeof(INPCBehavior).IsAssignableFrom(behaviorType))
-            {
-                _behavior = (INPCBehavior)Activator.CreateInstance(behaviorType);
-            }
+            _friendly = friendly;
+            _behavior = behavior;
+            _animationFrames = animationFrames;
             _invincibilityTimer = new Timer(500);
             _invincibilityTimer.Elapsed += OnInvincibleTimeout;
-            if (friendly)
+            this.Layer = layer;
+            this.CollidesWith = collidedWith;
+            if (Layer == default)
             {
-                this.Layer = CollisionLayer.Player;
-                this.CollidesWith = CollisionLayer.Enemy | CollisionLayer.HostileProjectile;
+                this.Layer = friendly ? CollisionLayer.Player : CollisionLayer.Enemy;
             }
-            else
+            if (CollidesWith == default)
             {
-                this.Layer = CollisionLayer.Enemy;
-                this.CollidesWith = CollisionLayer.Player | CollisionLayer.ItemCollider | CollisionLayer.FriendlyProjectile;
+                this.CollidesWith = friendly ? CollisionLayer.Enemy | CollisionLayer.HostileProjectile : CollisionLayer.Player | CollisionLayer.ItemCollider | CollisionLayer.FriendlyProjectile;
             }
         }
         public override void Update(double delta)
@@ -79,6 +93,10 @@ namespace TheGreen.Game.Entities.NPCs
         {
             _invincible = false;
             _invincibilityTimer.Stop();
+        }
+        public static NPC CloneNPC(NPC npc)
+        {
+            return new NPC(npc.ID, npc.Name, npc.Image, npc.Size, npc._health, npc.Damage, npc.CollidesWithTiles, npc._behavior.Clone(), npc.DrawBehindTiles, npc._friendly, npc._animationFrames, npc.Layer, npc.CollidesWith);
         }
     }
 }

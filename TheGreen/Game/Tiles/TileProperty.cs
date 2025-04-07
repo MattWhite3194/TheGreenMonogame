@@ -21,12 +21,9 @@ namespace TheGreen.Game.Tiles
         /// The tile does damage to entities.
         /// </summary>
         Overlay = 1 << 4,
-        /// <summary>
-        /// The tile's state does not change when tiles around it are updated
-        /// </summary>
-        StaticTileState = 1 << 5,
-        PickaxeMineable = 1 << 6,
-        AxeMineable = 1 << 7,
-        HammerMineable = 1 << 8,
+        PickaxeMineable = 1 << 5,
+        AxeMineable = 1 << 6,
+        HammerMineable = 1 << 7,
+        LargeTile = 1 << 8,
     }
 }

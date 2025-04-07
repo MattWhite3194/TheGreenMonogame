@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using TheGreen.Game.Input;
@@ -7,7 +8,7 @@ using TheGreen.Game.UIComponents;
 
 namespace TheGreen.Game.Menus
 {
-    public class MainMenu : UIComponentContainer
+    public class MainMenu
     {
         private Label _titleLabel;
         private Button _newGameButton;
@@ -22,7 +23,7 @@ namespace TheGreen.Game.Menus
         //new selector class that has a list of options and will instantiate button components for each selection and store a variable that keeps track of the selected.
 
         //TODO: export each menu to its own class so this doesn't become a nightmare file
-        public MainMenu(TheGreen game, GraphicsDevice graphicsDevice) : base(graphicsDevice:  graphicsDevice)
+        public MainMenu(TheGreen game, GraphicsDevice graphicsDevice)
         {
             _game = game;
             _menus = new Stack<UIComponentContainer>();
@@ -42,7 +43,21 @@ namespace TheGreen.Game.Menus
             _loadGameButton.OnButtonPress += LoadGame;
             _startMenu.AddUIComponent(_loadGameButton);
 
-            _backButton = new Button(new Vector2(200, Globals.NativeResolution.Y - 200), "Back", Vector2.Zero, borderRadius: 0, textColor: Color.White, textClickedColor: Color.Orange, textHoveredColor: Color.Yellow, drawCentered: true);
+            Button reduceUIScaleButton = new Button(Globals.ScreenCenter.ToVector2() + new Vector2(0, 40), "Reduce UI Scale", Vector2.Zero, borderRadius: 0, textColor: Color.White, textClickedColor: Color.Orange, textHoveredColor: Color.Yellow, drawCentered: true);
+            reduceUIScaleButton.OnButtonPress += () => 
+            {
+                _game.SetUIScaleMatrix(Math.Max(0.1f, TheGreen.UIScaleMatrix.M11 - 0.1f));
+            };
+            _startMenu.AddUIComponent(reduceUIScaleButton);
+
+            Button increaseUIScaleButton = new Button(Globals.ScreenCenter.ToVector2() + new Vector2(0, 60), "Increase UI Scale", Vector2.Zero, borderRadius: 0, textColor: Color.White, textClickedColor: Color.Orange, textHoveredColor: Color.Yellow, drawCentered: true);
+            increaseUIScaleButton.OnButtonPress += () =>
+            { 
+                _game.SetUIScaleMatrix(Math.Min(5f, TheGreen.UIScaleMatrix.M11 + 0.1f));
+            };
+            _startMenu.AddUIComponent(increaseUIScaleButton);
+
+            _backButton = new Button(new Vector2(150, Globals.NativeResolution.Y - 100), "Back", Vector2.Zero, borderRadius: 0, textColor: Color.White, textClickedColor: Color.Orange, textHoveredColor: Color.Yellow, drawCentered: true);
             _backButton.OnButtonPress += () => RemoveSubMenu();
             _createWorldMenu.AddUIComponent( _backButton );
 
@@ -52,32 +67,29 @@ namespace TheGreen.Game.Menus
 
             AddSubMenu(_startMenu);
         }
-        public override void Draw(SpriteBatch spriteBatch)
-        {
-            _menus.Peek().Draw(spriteBatch);
-        }
-        public override void HandleInput(InputEvent @event)
-        {
-            _menus.Peek().HandleInput(@event);
-        }
         private void StartNewGame()
         {
-            Dereference();
+            int numMenus = _menus.Count;
+            for (int i = 0; i < numMenus; i++)
+            {
+                Debug.WriteLine(_menus.Peek().ToString());
+                _menus.Pop().Dereference();
+            }
             _game.StartNewWorld(new Point(2100, 600));
-        }
-        public override void Update(double delta)
-        {
-            _menus.Peek().Update(delta);
         }
         private void LoadGame() {
             Debug.WriteLine("You probably want to implement this at some point... (for future reference)");
         }
         private void AddSubMenu(UIComponentContainer menu)
         {
+            UIManager.RegisterContainer(menu);
+            InputManager.RegisterHandler(menu);
             _menus.Push(menu);
         }
         private void RemoveSubMenu()
         {
+            UIManager.UnregisterContainer(_menus.Peek());
+            InputManager.UnregisterHandler(_menus.Peek());
             _menus.Pop();
         }
     }

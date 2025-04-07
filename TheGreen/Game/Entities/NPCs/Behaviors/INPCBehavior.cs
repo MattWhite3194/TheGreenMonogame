@@ -7,5 +7,6 @@ namespace TheGreen.Game.Entities.NPCs.Behaviors
     public interface INPCBehavior
     {
         void AI(double delta, NPC enemy);
+        INPCBehavior Clone();
     }
 }

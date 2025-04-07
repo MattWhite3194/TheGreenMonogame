@@ -18,6 +18,9 @@ namespace TheGreen.Game.UIComponents
             int j = ComponentCount / _cols;
             component.Position = new Vector2((_margin * i) + (component.Size.X * i), (_margin * j) + (component.Size.Y * j));
             this.AddUIComponent(component);
+            i = ComponentCount % _cols;
+            j = ComponentCount / _cols;
+            this.Size = new Vector2((_margin * (_cols + 1)) + (component.Size.X * _cols), (_margin * (j + 1)) + (component.Size.Y * j));
         }
     }
 }

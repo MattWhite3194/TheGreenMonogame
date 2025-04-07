@@ -35,7 +35,7 @@ namespace TheGreen.Game.Entities.NPCs.Behaviors
                     newVelocity.X = _maxSpeed * Math.Sign(newVelocity.X);
                 if (_elapsedTime >= _nextJumpTime)
                 {
-                    _nextJumpTime = Main.Random.NextDouble() * 2.0 + 2.0;
+                    _nextJumpTime = Main.Random.NextDouble() * 5.0 + 2.0;
                     _elapsedTime = 0.0;
                     newVelocity.Y = _maxSpeed * Main.Random.Next(-4, -3);
                     newVelocity.X = _maxSpeed * _directionX * Main.Random.Next(2, 5);
@@ -49,6 +49,11 @@ namespace TheGreen.Game.Entities.NPCs.Behaviors
                 enemy.FlipSprite = false;
 
             enemy.Velocity = newVelocity;
+        }
+
+        public INPCBehavior Clone()
+        {
+            return new MutantCricketBehavior();
         }
     }
 }

@@ -4,12 +4,12 @@ using TheGreen.Game.WorldGeneration;
 
 namespace TheGreen.Game.Tiles
 {
-    internal class TorchData : TileData
+    public class TorchData : TileData
     {
-        public TorchData(TileProperty properties, Color color, int itemID = -1) : base(properties, color, itemID)
+        public TorchData(int tileID, TileProperty properties, Color color, int itemID = -1) : base(tileID, properties, color, itemID)
         {
         }
-        public override int VerifyTile(ushort tileID, int x, int y)
+        public override int VerifyTile(int x, int y)
         {
             ushort right = WorldGen.World.GetTileID(x + 1, y);
             ushort bottom = WorldGen.World.GetTileID(x, y + 1);
@@ -19,7 +19,11 @@ namespace TheGreen.Game.Tiles
                 return 1;
             return -1;
         }
-        public override byte GetUpdatedTileState(ushort tileID, int x, int y)
+        public override bool CanTileBeDamaged(int x, int y)
+        {
+            return true;
+        }
+        public override byte GetUpdatedTileState(int x, int y)
         {
             ushort bottom = WorldGen.World.GetTileID(x, y + 1);
             ushort left = WorldGen.World.GetTileID(x - 1, y);

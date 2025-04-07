@@ -30,21 +30,14 @@ namespace TheGreen.Game.UIComponents
         {
             foreach (UIComponent component in _uiComponents)
             {
-                if (InputManager.IsEventHandled(@event))
-                {
-                    break;
-                }
-                //take all input if it is focused
+                if (InputManager.IsEventHandled(@event)) break;
+
+                if (!component.IsVisible()) continue;
+
                 if (component.IsFocused())
                 {
                     component.OnGuiInput(@event);
                 }
-                //Don't accept input if it is hidden
-                if (!component.IsVisible())
-                {
-                    continue;
-                }
-                //If it isn't focused, only take mouse events
                 else if (@event is MouseInputEvent)
                 {
                     if (InputManager.GetMouseWindowBounds().Intersects(component.GetBounds()))
@@ -59,10 +52,8 @@ namespace TheGreen.Game.UIComponents
 
             foreach (UIComponent component in _uiComponents)
             {
-                if (!component.IsVisible())
-                {
-                    continue;
-                }
+                if (!component.IsVisible()) continue;
+
                 if (InputManager.GetMouseWindowBounds().Intersects(component.GetBounds()))
                 {
                     if (!component.MouseInside)

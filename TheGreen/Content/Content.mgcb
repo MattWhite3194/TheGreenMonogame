@@ -20,12 +20,6 @@
 /processorParam:TextureFormat=Compressed
 /build:Assets/Fonts/File.spritefont
 
-#begin Assets/Shaders/LightShader.fx
-/importer:EffectImporter
-/processor:EffectProcessor
-/processorParam:DebugMode=Auto
-/build:Assets/Shaders/LightShader.fx
-
 #begin Assets/Textures/Backgrounds/Normal/Mountains.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -182,6 +176,18 @@
 /processorParam:TextureFormat=Color
 /build:Assets/Textures/Items/Item4.png
 
+#begin Assets/Textures/Items/Item5.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Items/Item5.png
+
 #begin Assets/Textures/Player/Player.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -301,6 +307,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Assets/Textures/Tiles/Tile7.png
+
+#begin Assets/Textures/Tiles/Tile8.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Assets/Textures/Tiles/Tile8.png
 
 #begin Assets/Textures/UIComponents/ItemSlot.png
 /importer:TextureImporter

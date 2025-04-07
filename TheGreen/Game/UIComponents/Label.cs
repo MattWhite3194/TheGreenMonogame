@@ -62,7 +62,7 @@ namespace TheGreen.Game.UIComponents
             {
                 spriteBatch.Draw(image, _drawPosition, null, color, _rotation, Vector2.Zero, _scale, SpriteEffects.None, 0.0f);
             }
-            spriteBatch.DrawString(ContentLoader.GameFont, _text, _stringPosition + _origin + new Vector2(1, 1) * _scale * 2, Color.Black, _rotation, _origin, _scale, SpriteEffects.None, 0.0f);
+            spriteBatch.DrawString(ContentLoader.GameFont, _text, _stringPosition + _origin + new Vector2(1, 1) * _scale, Color.Black, _rotation, _origin, _scale, SpriteEffects.None, 0.0f);
             spriteBatch.DrawString(ContentLoader.GameFont, _text, _stringPosition + _origin, _textColor, _rotation, _origin, _scale, SpriteEffects.None, 0.0f);
             
         }

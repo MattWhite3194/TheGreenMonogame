@@ -28,7 +28,7 @@ namespace TheGreen.Game.WorldGeneration.WorldUpdaters
                 {
                     continue;
                 }
-                if (WorldGen.World.GetTileID(x + point.X, y + point.Y) != TileDatabase.GetTileBaseID(overlayTileID) || WorldGen.World.GetTileState(x + point.X, y + point.Y) == 255)
+                if (WorldGen.World.GetTileID(x + point.X, y + point.Y) != TileDatabase.GetTileData(overlayTileID).BaseTileID || WorldGen.World.GetTileState(x + point.X, y + point.Y) == 255)
                     continue;
                 _overlayUpdateQueue.Enqueue((x + point.X, y + point.Y, overlayTileID));
                 _baseTiles.Add((x + point.X, y + point.Y, overlayTileID));
@@ -41,7 +41,7 @@ namespace TheGreen.Game.WorldGeneration.WorldUpdaters
                 return;
             (int x, int y, ushort overlayTileID) = _overlayUpdateQueue.Dequeue();
             _baseTiles.Remove((x, y, overlayTileID));
-            if (WorldGen.World.GetTileState(x, y) != 255 && WorldGen.World.GetTileID(x, y) == TileDatabase.GetTileBaseID(overlayTileID))
+            if (WorldGen.World.GetTileState(x, y) != 255 && WorldGen.World.GetTileID(x, y) == TileDatabase.GetTileData(overlayTileID).BaseTileID)
             {
                 WorldGen.World.SetTile(x, y, overlayTileID);
             }

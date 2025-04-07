@@ -3,101 +3,48 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using TheGreen.Game.Input;
 using TheGreen.Game.Items;
+using TheGreen.Game.Tiles;
 using TheGreen.Game.UIComponents;
 
 namespace TheGreen.Game.Inventory
 {
     public class InventoryManager : UIComponentContainer
     {
-        //TODO: change item slots to have a reference to an item
-        //set the pointers for the hotbar and menu to the inventoryItems array. will nullify the use for the ItemsChanged method
-        private Item[] _inventoryItems;
-        private ItemSlot[] _inventoryItemSlots;
-        private ItemSlot[] _hotbarItemSlots;
-        private Grid _hotbar;
-        private Grid _menu;
+        private Hotbar _hotbar;
+        private Inventory _inventoryMenu;
         private DragItem _dragItem;
-        private int selected;
-        private UIComponentContainer _activeMenu;
+        private InventoryTileData _inventoryTileData;
+        private Point _inventoryTileDataCoordinates;
+        private Inventory _tileInventory;
+        private Grid _activeMenu;
         public InventoryManager(int rows, int cols)
         {
-            _inventoryItems = new Item[rows * cols];
-
             //Temporary inventory
-            _inventoryItems[0] = ItemDatabase.GetItemByID(0, quantity: 500);
-            _inventoryItems[1] = ItemDatabase.GetItemByID(1, quantity: 500);
-            _inventoryItems[2] = ItemDatabase.GetItemByID(2);
-            _inventoryItems[3] = ItemDatabase.GetItemByID(3, quantity: 500);
-            _inventoryItems[4] = ItemDatabase.GetItemByID(4, quantity: 100);
+            Item[] inventoryItems = new Item[rows * cols];
+            inventoryItems[0] = ItemDatabase.InstantiateItemByID(0, quantity: 500);
+            inventoryItems[1] = ItemDatabase.InstantiateItemByID(1, quantity: 500);
+            inventoryItems[2] = ItemDatabase.InstantiateItemByID(2);
+            inventoryItems[3] = ItemDatabase.InstantiateItemByID(3, quantity: 500);
+            inventoryItems[4] = ItemDatabase.InstantiateItemByID(4, quantity: 500);
+            inventoryItems[5] = ItemDatabase.InstantiateItemByID(5, quantity: 500);
 
-            
-
-            _inventoryItemSlots = new ItemSlot[rows * cols];
-            _hotbarItemSlots = new ItemSlot[cols];
-
-            _menu = new Grid(cols, margin: 2, position: new Vector2(20, 20));
-            _hotbar = new Grid(cols, margin: 2, position: new Vector2(20, 20));
-
-
-            for (int i = 0; i < _inventoryItemSlots.Length; i++)
-            {
-                int index = i;
-                _inventoryItemSlots[i] = new ItemSlot(Vector2.Zero, ContentLoader.ItemSlotTexture, Color.ForestGreen);
-                _menu.AddGridItem(_inventoryItemSlots[i]);
-                _inventoryItemSlots[i].OnGuiInput += (@event) => OnItemSlotGuiInput(index, @event);
-                _inventoryItemSlots[index].Item = _inventoryItems[index];
-            }
-            for (int i = 0; i < cols; i++)
-            {
-                int index = i;
-                _hotbarItemSlots[i] = new ItemSlot(Vector2.Zero, ContentLoader.ItemSlotTexture, new Color(34, 139, 34, 200));
-                _hotbar.AddGridItem(_hotbarItemSlots[i]);
-                _hotbarItemSlots[i].OnGuiInput += (@event) => OnItemSlotGuiInput(index, @event);
-                _hotbarItemSlots[index].Item = _inventoryItems[index];
-            }
             _dragItem = new DragItem(Vector2.Zero);
-
+            _inventoryMenu = new Inventory(cols, _dragItem, inventoryItems, margin: 2, position: new Vector2(20, 20));
+            _hotbar = new Hotbar(cols, inventoryItems, margin: 2, position: new Vector2(20, 20));
 
             _activeMenu = _hotbar;
-
-            SetSelected(0);
-        }
-
-        public override void Update(double delta)
-        {
-            _activeMenu.Update(delta);
-            _dragItem.Update(delta);
-            
-        }
-
-        public override void Draw(SpriteBatch spritebatch)
-        {
-            _activeMenu.Draw(spritebatch);
-            _dragItem.Draw(spritebatch);
         }
         public override void HandleInput(InputEvent @event)
         {
             //Don't accept any input if the player is using an item to prevent any weird bugs if the player decides to press random buttons while using the item
             //TODO: maybe want to make this a little less dependent and spaghetti-ish
             if (Main.EntityManager.GetPlayer().ItemCollider.ItemActive) return;
-            if (@event.InputButton == InputButton.MiddleMouse)
-            {
-                if (@event.EventType == InputEventType.MouseButtonUp)
-                {
-                    SetSelected((selected + 1) % _hotbarItemSlots.Length);
-                }
-                else
-                {
-                    SetSelected((selected + _hotbarItemSlots.Length - 1) % _hotbarItemSlots.Length);
-                }
-                InputManager.MarkInputAsHandled(@event);
-            }
             else if (@event.EventType == InputEventType.KeyDown && @event.InputButton == InputButton.Inventory)
             {
                 SetInventoryOpen(!InventoryVisible());
                 if (_dragItem.Item != null)
                 {
-                    Item itemDrop = AddItem(_dragItem.Item);
+                    Item itemDrop = _inventoryMenu.AddItem(_dragItem.Item);
                     _dragItem.Item = null;
                     if (itemDrop != null)
                     {
@@ -109,6 +56,7 @@ namespace TheGreen.Game.Inventory
             else
             {
                 _activeMenu.HandleInput(@event);
+                _tileInventory?.HandleInput(@event);
             }
             if (InputManager.IsEventHandled(@event))
                 return;
@@ -119,183 +67,85 @@ namespace TheGreen.Game.Inventory
                     return;
                 Main.EntityManager.AddItemDrop(_dragItem.Item, InputManager.GetMouseWorldPosition().ToVector2());
                 _dragItem.Item = null;
-                InputManager.IsEventHandled(@event);
-            }
-        }
-
-        //handle item slot input for individual item slots
-        private void OnItemSlotGuiInput(int index, InputEvent @event)
-        {
-            if (@event.InputButton == InputButton.LeftMouse && @event.EventType == InputEventType.MouseButtonDown)
-            {
-                if (!InventoryVisible())
-                {
-                    SetSelected(index);
-                    _hotbarItemSlots[selected].SetColor(Color.Yellow);
-                }
-                else
-                {
-                    PlaceItem(index);
-                }
                 InputManager.MarkInputAsHandled(@event);
             }
-            else if (@event.InputButton == InputButton.RightMouse && @event.EventType == InputEventType.MouseButtonDown)
-            {
-                if (InventoryVisible())
-                {
-                    SplitItem(index);
-                    InputManager.MarkInputAsHandled(@event);
-                }
-            }
-        }
-        /// <summary>
-        /// Attempts to add the item to the inventory.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns>The item with it's remaining quantity. Null if the remainder is zero.</returns>
-        public Item AddItem(Item item)
-        {
-            int emptyIndex = -1;
-            int remainingQuantity = item.Quantity;
-            for (int i = 0; i < _inventoryItems.Length; i++)
-            {
-                //get first empty slot starting from the back of the array
-                if (emptyIndex == -1 && _inventoryItems[_inventoryItems.Length - 1 - i] == null)
-                    emptyIndex = _inventoryItems.Length - 1 - i;
-                else if (emptyIndex != -1 && !item.Stackable)
-                    break;
-
-                if (item.Stackable && item.ID == (_inventoryItems[i]?.ID ?? -1))
-                {
-                    if (_inventoryItems[i].Quantity >= 30) //MAXSTACK
-                        continue;
-                    int newQuantity = _inventoryItems[i].Quantity + remainingQuantity;
-                    remainingQuantity = int.Clamp(newQuantity - 30, 0, 30);
-                    newQuantity -= remainingQuantity;
-                    
-                    SetItemQuantity(i, newQuantity);
-                }
-            }
-            item.Quantity = remainingQuantity;
-            if (emptyIndex != -1 && item.Quantity > 0)
-            {
-                SetItem(item, emptyIndex);
-                return null;
-            }
-            else if (item.Quantity == 0)
-                return null;
-            item.Quantity = remainingQuantity;
-            return item;
         }
 
-        private void PlaceItem(int index)
+        public override void Update(double delta)
         {
-            if (_dragItem.Item == null && _inventoryItems[index] == null)
-            {
-                return;
-            }
-            if (_dragItem.Item == null)
-            {
-                _dragItem.Item = _inventoryItems[index];
-                SetItem(null, index);
-            }
-            else if (_inventoryItems[index] == null)
-            {
-                SetItem(_dragItem.Item, index);
-                _dragItem.Item = null;
-            }
-            else if (_inventoryItems[index].ID == _dragItem.Item.ID && _inventoryItems[index].Stackable)
-            {
-                SetItemQuantity(index, _inventoryItems[index].Quantity + _dragItem.Item.Quantity);
-                _dragItem.Item = null;
-            }
-            else
-            {
-                Item temp = _inventoryItems[index];
-                SetItem(_dragItem.Item, index);
-                _dragItem.Item = temp;
-            }
+            _activeMenu.Update(delta);
+            _tileInventory?.Update(delta);
+            _dragItem.Update(delta);
         }
 
-        private void SplitItem(int index)
+        public override void Draw(SpriteBatch spritebatch)
         {
-            if (_inventoryItems[index] == null)
-                return;
-            if (_dragItem.Item == null)
-            {
-                if (_inventoryItems[index].Stackable)
-                {
-                    Item splitItem = ItemDatabase.GetItemByID(_inventoryItems[index].ID);
-                    splitItem.Quantity = (int)Math.Ceiling(_inventoryItems[index].Quantity / 2.0f);
-                    _dragItem.Item = splitItem;
-                    SetItemQuantity(index, _inventoryItems[index].Quantity - splitItem.Quantity);
-                }
-                else
-                {
-                    _dragItem.Item = _inventoryItems[index];
-                    SetItem(null, index);
-                    
-                }
-            }
+            _activeMenu.Draw(spritebatch);
+            _tileInventory?.Draw(spritebatch);
+            _dragItem.Draw(spritebatch);
         }
+        
         public Item GetSelected()
         {
             if (InventoryVisible())
             {
                 return _dragItem.Item;
             }
-            return _inventoryItems[selected];
-        }
-        public void SetSelected(int index)
-        {
-            _hotbarItemSlots[selected].SetColor(new Color(34, 139, 34, 200));
-            selected = index;
-            _hotbarItemSlots[selected].SetColor(Color.Yellow);
-        }
-        private void SetItem(Item item, int index)
-        {
-            _inventoryItems[index] = item;
-            _inventoryItemSlots[index].Item = item;
-            if (index < _hotbarItemSlots.Length)
-                _hotbarItemSlots[index].Item = item;
-        }
-        public void SetItemQuantity(int index, int quantity)
-        {
-            _inventoryItems[index].Quantity = quantity;
-            SetItem(_inventoryItems[index], index);
-            if (quantity <= 0)
-            {
-                SetItem(null, index);
-            }
-        }
-        public void SetSelectedQuantity(int quantity)
-        {
-            if (InventoryVisible())
-            {
-                GetSelected().Quantity -= 1;
-                _dragItem.Item = GetSelected();
-                if (_dragItem.Item.Quantity <= 0)
-                    _dragItem.Item = null;
-            }
-            else
-            {
-                SetItemQuantity(selected, quantity);
-            }
+            return _hotbar.GetSelected();
         }
 
         public bool InventoryVisible()
         {
-            return _activeMenu == _menu;
+            return _activeMenu == _inventoryMenu;
         }
 
-        public void DisplayEntityInventory(int cols, int rows, Item[] items)
+        public void DisplayTileInventory(InventoryTileData inventoryTileData, Point coordinates, Item[] items)
         {
-            _activeMenu = _menu;
-            //TODO: implement this for chests
+            //TODO: close active tileinventory if there is one
+            SetInventoryOpen(true);
+            if (_inventoryTileData != null && coordinates != _inventoryTileDataCoordinates)
+            {
+                _inventoryTileData.CloseInventory(_inventoryTileDataCoordinates.X, _inventoryTileDataCoordinates.Y);
+            }
+            _tileInventory = new Inventory(inventoryTileData.Cols, _dragItem, items, margin: 2, position: _inventoryMenu.Position + new Vector2(_inventoryMenu.Size.X + 30, 0 ), itemSlotColor: Color.Crimson);
+            _inventoryTileDataCoordinates = coordinates;
+            _inventoryTileData = inventoryTileData;
         }
         public void SetInventoryOpen(bool open)
         {
-            _activeMenu = open ? _menu : _hotbar;
+            _activeMenu = open ? _inventoryMenu : _hotbar;
+            if (!InventoryVisible())
+            {
+                _tileInventory = null;
+                
+                if (_inventoryTileData != null)
+                {
+                    _inventoryTileData.CloseInventory(_inventoryTileDataCoordinates.X, _inventoryTileDataCoordinates.Y);
+                    _inventoryTileData = null;
+                }
+            }
+        }
+        public bool UseSelected()
+        {
+            Item item = GetSelected();
+            if (item == null)
+                return false;
+            bool itemUsed = item.UseItem();
+            if (!item.Stackable || !itemUsed)
+                return itemUsed;
+            if (InventoryVisible())
+            {
+                _dragItem.Item.Quantity -= 1;
+                if (_dragItem.Item.Quantity <= 0)
+                    _dragItem.Item = null;
+            }
+            else
+                _hotbar.SetSelectedQuantity(item.Quantity - 1);
+            return itemUsed;
+        }
+        public Item AddItemToPlayerInventory(Item item)
+        {
+            return _inventoryMenu.AddItem(item);
         }
     }
 }

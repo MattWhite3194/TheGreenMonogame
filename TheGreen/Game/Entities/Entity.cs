@@ -12,6 +12,7 @@ namespace TheGreen.Game.Entities
     {
         public Vector2 Velocity;
         public bool IsOnFloor = false, IsOnCeiling = false;
+        public bool DrawBehindTiles = false;
         /// <summary>
         /// The entity will stop when it collides with a tile
         /// </summary>
@@ -26,7 +27,7 @@ namespace TheGreen.Game.Entities
         /// </summary>
         public CollisionLayer CollidesWith;
 
-        protected Entity(Texture2D image, Vector2 position, Vector2 size = default, List<(int, int)> animationFrames = null) : base(image, position, size, animationFrames)
+        protected Entity(Texture2D image, Vector2 position, Vector2 size = default, Vector2 origin = default, List<(int, int)> animationFrames = null) : base(image, position, size, origin: origin, animationFrames: animationFrames)
         {
         }
 
@@ -41,6 +42,20 @@ namespace TheGreen.Game.Entities
         public virtual Rectangle GetBounds()
         {
             return new Rectangle(Position.ToPoint(), Size.ToPoint());
+        }
+        public override void Draw(SpriteBatch spriteBatch)
+        {
+            Point centerTilePosition = ((Position + Size / 2) / Globals.TILESIZE).ToPoint();
+            spriteBatch.Draw(Image,
+                new Vector2((int)Position.X, (int)Position.Y) + Origin,
+                Animation?.AnimationRectangle ?? null,
+                Main.LightEngine.GetLight(centerTilePosition.X, centerTilePosition.Y),
+                Rotation,
+                Origin,
+                Scale,
+                FlipSprite ? SpriteEffects.FlipHorizontally : SpriteEffects.None,
+                0.0f
+            );
         }
     }
 }

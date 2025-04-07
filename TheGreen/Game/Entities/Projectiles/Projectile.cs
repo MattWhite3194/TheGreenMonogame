@@ -7,7 +7,7 @@ namespace TheGreen.Game.Entities.Projectiles
     public class Projectile : Entity
     {
         private int _timeLeft;
-        public Projectile(Texture2D image, Vector2 position, Vector2 size, bool hostile, bool friendly, bool collidesWithTiles, List<(int, int)> animationFrames = null) : base(image, position, size, animationFrames)
+        public Projectile(Texture2D image, Vector2 position, Vector2 size, bool hostile, bool friendly, bool collidesWithTiles, List<(int, int)> animationFrames = null) : base(image, position, size, animationFrames: animationFrames)
         {
             this.Layer = 0;
             this.CollidesWith = 0;

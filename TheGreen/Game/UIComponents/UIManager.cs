@@ -5,7 +5,7 @@ using System.Linq;
 namespace TheGreen.Game.UIComponents
 {
     /// <summary>
-    /// Handles input and drawing for all UIComponent Containers.
+    /// updating and drawing for all UIComponent Containers.
     /// </summary>
     public static class UIManager
     {

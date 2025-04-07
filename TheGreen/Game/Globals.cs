@@ -8,11 +8,11 @@ namespace TheGreen.Game
 {
     static class Globals
     {
-        public static Point NativeResolution = new Point(1280, 720);
+        public static Point NativeResolution = new Point(960, 540);
         public static readonly int TILESIZE = 16;
-        public static Point DrawDistance = new Point(1280 / TILESIZE + 1, 720 / TILESIZE + 2);
+        public static Point DrawDistance = new Point(960 / TILESIZE + 1, 540 / TILESIZE + 2);
         public static readonly float GRAVITY = 1400.0f;
-        public static Point ScreenCenter = new Point(1280 / 2, 720 / 2);
+        public static Point ScreenCenter = new Point(960 / 2, 540 / 2);
         /// <summary>
         /// The light level of an empty tile at the current time. Does not affect stored tile light, only the final draw light
         /// </summary>
@@ -31,18 +31,6 @@ namespace TheGreen.Game
         /// A mapping gradient of the current day time to the current Global lighting value.
         /// </summary>
         private static List<(int, byte)> _timeToLightGradient;
-
-        /// <summary>
-        /// Adjusts the native resolution to an integer scaling (x, y) of the device's resolution
-        /// </summary>
-        /// <param name="deviceResolution">The resolution of the current device.</param>
-        public static void SetNativeResolution(Point deviceResolution)
-        {
-            Point nativeResolution = deviceResolution.X % 1280 == 0 ? new Point(1280, 720) : new Point(960, 540);
-            DrawDistance = new Point(nativeResolution.X / TILESIZE + 1, nativeResolution.Y / TILESIZE + 2);
-            ScreenCenter = new Point(nativeResolution.X / 2, nativeResolution.Y / 2);
-            NativeResolution = nativeResolution;
-        }
 
         public static void UpdateGameTime(double delta)
         {

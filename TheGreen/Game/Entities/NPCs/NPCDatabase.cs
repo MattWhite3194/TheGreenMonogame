@@ -8,9 +8,9 @@ namespace TheGreen.Game.Entities.NPCs
     public static class NPCDatabase
     {
 
-        private static Dictionary<int, object[]> _npcs = new Dictionary<int, object[]>
+        private static Dictionary<int, NPC> _npcs = new Dictionary<int, NPC>
         {
-            {0, [0, "Mutant Cricket", ContentLoader.EnemyTextures[0], new Vector2(69, 34), 100, 10, true, false, typeof(MutantCricketBehavior), new List<(int, int)> { (0, 3), (4, 4)}]}
+            {0, new NPC(0, "Mutant Cricket", ContentLoader.EnemyTextures[0], new Vector2(69, 34), 100, 10, true, new MutantCricketBehavior(), animationFrames: new List<(int, int)> { (0, 3), (4, 4)})}
         };
         /// <summary>
         /// 
@@ -19,9 +19,7 @@ namespace TheGreen.Game.Entities.NPCs
         /// <returns>A new npc instance with the specified id</returns>
         public static NPC InstantiateNPCByID(int npcID)
         {
-            //little bit of code smell (¬_¬)
-            NPC npc = (NPC)Activator.CreateInstance(typeof(NPC), _npcs[npcID]);
-            return npc;
+            return NPC.CloneNPC(_npcs[npcID]);
         }
     }
 }

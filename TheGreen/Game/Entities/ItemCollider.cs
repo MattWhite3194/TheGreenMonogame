@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using TheGreen.Game.Input;
 using TheGreen.Game.Inventory;
@@ -30,12 +29,11 @@ namespace TheGreen.Game.Entities
                 {
                     if (mouseInputEvent.EventType == InputEventType.MouseButtonDown)
                     {
-                        if (ItemActive || _inventory.GetSelected() == null) return;
+                        if (ItemActive) return;
                         _holdTime = 0.0f;
                         _canUseItem = true;
                         _leftReleased = false;
                         ItemActive = true;
-                        this.Item = _inventory.GetSelected();
                     }
                     else if (mouseInputEvent.EventType == InputEventType.MouseButtonUp)
                     {
@@ -50,17 +48,18 @@ namespace TheGreen.Game.Entities
         {
             if (!ItemActive)
                 return;
+            Item = _inventory.GetSelected();
+            if (Item == null) {
+                ItemActive = false;
+                return;
+            }
+
             FlipSprite = Main.EntityManager.GetPlayer().FlipSprite;
             Position = Main.EntityManager.GetPlayer().Position + new Vector2(0, 20) + (FlipSprite ? new Vector2(12, 0) : new Vector2(8, 0));
             Origin = FlipSprite ? new Vector2(Item.Image.Width + 8, Item.Image.Height) : new Vector2(-8, Item.Image.Height);
-            if (_canUseItem)
+            if (_canUseItem && _inventory.UseSelected())
             {
-                if (Item.UseItem())
-                {
-                    _canUseItem = false;
-                    if (Item.Stackable)
-                    _inventory.SetSelectedQuantity(Item.Quantity - 1);
-                }
+                _canUseItem = false;
             }
             switch (Item.UseStyle)
             {
@@ -86,7 +85,7 @@ namespace TheGreen.Game.Entities
             {
                 _holdTime = 0.0f;
                 _canUseItem = true;
-                if (!Item.AutoUse || _leftReleased)
+                if (!Item.AutoUse || _leftReleased || _inventory.GetSelected() == null)
                 {
                     ItemActive = false;
                 }
@@ -96,10 +95,11 @@ namespace TheGreen.Game.Entities
         {
             if (!ItemActive)
                 return;
+            Point centerTilePosition = ((Position + Size / 2) / Globals.TILESIZE).ToPoint();
             spriteBatch.Draw(Item.Image,
                         Position,
                         null,
-                        Color.White,
+                        Main.LightEngine.GetLight(centerTilePosition.X, centerTilePosition.Y),
                         Rotation,
                         Origin,
                         Item.Scale,

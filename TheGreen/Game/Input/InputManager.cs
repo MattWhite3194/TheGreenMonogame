@@ -16,7 +16,7 @@ namespace TheGreen.Game.Input
             {InputButton.Left, Keys.A },
             {InputButton.Right, Keys.D},
             {InputButton.Jump, Keys.Space},
-            {InputButton.Inventory, Keys.I}
+            {InputButton.Inventory, Keys.E}
         };
         private static List<IInputHandler> _inputHandlers = new();
         private static KeyboardState _previousKeyboardState = Keyboard.GetState();
@@ -128,14 +128,13 @@ namespace TheGreen.Game.Input
         }
         public static Vector2 GetMouseWindowPosition()
         {
-            MouseState mouseState = Mouse.GetState();
-            return Vector2.Transform(mouseState.Position.ToVector2(), Matrix.Invert(TheGreen.ScreenScaleMatrix));
+            return Vector2.Transform(Mouse.GetState().Position.ToVector2(), Matrix.Invert(TheGreen.UIScaleMatrix));
         }
         public static Point GetMouseWorldPosition()
         {
-            Point mousePosition = GetMouseWindowPosition().ToPoint();
+            Vector2 mousePosition = (Mouse.GetState().Position.ToVector2() - TheGreen.RenderDestination.Location.ToVector2()) * new Vector2(Globals.NativeResolution.X / (float)TheGreen.RenderDestination.Width) ;
             Point translation = Main.GetCameraPosition().ToPoint();
-            return mousePosition + translation;
+            return mousePosition.ToPoint() + translation;
         }
         public static Rectangle GetMouseWindowBounds()
         {

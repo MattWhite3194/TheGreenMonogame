@@ -7,17 +7,17 @@ namespace TheGreen.Game.Items
 {
     public class TileItem : Item
     {
-        private ushort _tileID;
+        public readonly ushort TileID;
         public TileItem(int id, string name, string description, Texture2D image, ushort tileID) : base(id, name, description, image, true, 0.15, true)
         { 
-            this._tileID = tileID;
+            this.TileID = tileID;
         }
         public override bool UseItem()
         {
             Point mouseTilePosition = InputManager.GetMouseWorldPosition() / new Point(Globals.TILESIZE, Globals.TILESIZE);
             if (WorldGen.World.GetTileID(mouseTilePosition.X, mouseTilePosition.Y) == 0)
             {
-                if (WorldGen.World.SetTile(mouseTilePosition.X, mouseTilePosition.Y, _tileID))
+                if (WorldGen.World.SetTile(mouseTilePosition.X, mouseTilePosition.Y, TileID))
                 {
                     return true;
                 }

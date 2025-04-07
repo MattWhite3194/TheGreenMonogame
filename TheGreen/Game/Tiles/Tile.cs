@@ -11,6 +11,5 @@
         public ushort WallID;
         public byte WallState;
         public byte Liquid;
-        public byte Light;
     }
 }

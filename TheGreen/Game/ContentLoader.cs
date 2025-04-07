@@ -1,8 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 
 namespace TheGreen.Game
@@ -15,7 +13,6 @@ namespace TheGreen.Game
         public static Texture2D[] EnemyTextures;
         public static Texture2D ItemSlotTexture;
         public static SpriteFont GameFont;
-        public static Effect LightShader;
         public static Texture2D Cracks;
         public static Texture2D TreesBackground;
         public static Texture2D TreesFartherBackground;
@@ -31,7 +28,6 @@ namespace TheGreen.Game
             PlayerTexture = content.Load<Texture2D>("Assets/Textures/Player/Player");
             ItemSlotTexture = content.Load<Texture2D>("Assets/Textures/UIComponents/ItemSlot");
             GameFont = content.Load<SpriteFont>("Assets/Fonts/File");
-            LightShader = content.Load<Effect>("Assets/Shaders/LightShader");
             Cracks = content.Load<Texture2D>("Assets/Textures/Tiles/Extras/Cracks");
             TreesBackground = content.Load<Texture2D>(Globals.NativeResolution.X == 1280 ? "Assets/Textures/Backgrounds/Upscaled/TreesUpscaled" : "Assets/Textures/Backgrounds/Normal/Trees");
             TreesFartherBackground = content.Load<Texture2D>(Globals.NativeResolution.X == 1280 ? "Assets/Textures/Backgrounds/Upscaled/TreesFartherUpscaled" : "Assets/Textures/Backgrounds/Normal/TreesFarther");
