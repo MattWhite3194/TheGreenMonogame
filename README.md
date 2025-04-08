@@ -2,8 +2,8 @@
 ![alt text](TheGreen/TheGreenProgressPhotos/Cover.png?raw=true)
 
 ## About
-The Green is a 2D sanbox game where players can explore a 2d randomly generated world.  
-Players can build, fight, and explore a fully destructable tile world.  
+The Green is a 2D sanbox game inspired by the popular 2D indie game, Terraria.  
+Players can build, fight, and explore a fully destructable, procedurally generated tile world.  
 
 ## Game Showcase
 
