@@ -18,7 +18,6 @@ Players can build, fight, and explore a fully destructable tile world.
 ## Technical
 The Green was built using the opensource Monogame framework, which is a reimplementation of Microsoft's XNA game framework.  
 C# is the language of choice for this project, as it is Object-Oriented, and allows for a cleaner development environment.  
-The project was written in Microsoft's Visual Studio IDE.  
 
 ## Progress
 
