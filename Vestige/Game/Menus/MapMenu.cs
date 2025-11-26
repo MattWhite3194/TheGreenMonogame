@@ -89,6 +89,8 @@ namespace Vestige.Game.Menus
             spriteBatch.End();
             spriteBatch.Begin(samplerState: SamplerState.PointClamp, transformMatrix: Matrix.CreateScale(parentSize.X / Vestige.NativeResolution.X) * Matrix.CreateTranslation(new Vector3((parentSize / 2.0f) + (_mapPosition * (_userZoom * _defaultZoom)), 0)));
             spriteBatch.Draw(_map.MapRenderTarget, Vector2.Zero, null, Color.White, 0.0f, _mapOrigin, _userZoom * _defaultZoom, SpriteEffects.None, 0.0f);
+            //Draw player names
+            //TODO: draw head icon
             foreach (Player player in Main.EntityManager.GetPlayers())
             {
                 if (player == null || player.Dead) continue;

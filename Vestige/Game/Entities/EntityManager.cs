@@ -170,18 +170,14 @@ namespace Vestige.Game.Entities
             int tileWidth = entity.GetBounds().Width / Vestige.TILESIZE;
             int tileHeight = entity.GetBounds().Height / Vestige.TILESIZE;
 
+            //An entity can move at max 16 pixels at a time, to ensure a tile collision isn't skipped if the entity was moving to fast
             //horizontal tile collisions
-            int distanceFactor = (int)Math.Min(entity.Size.X, Vestige.TILESIZE);
             float distanceX = entity.Velocity.X * (float)delta;
+            int numTiles = (int)Math.Floor(Math.Abs(distanceX) / (Vestige.TILESIZE - 1));
             int horizontalCollisionDirection = 0;
-            List<float> horizontalDistances = new List<float>();
-            for (int _ = 0; _ < Math.Floor(distanceX / (distanceFactor - 1)); _++)
+            for (int i = 0; i < numTiles + 1; i++)
             {
-                horizontalDistances.Add(distanceFactor - 1);
-            }
-            horizontalDistances.Add(distanceX % (distanceFactor - 1));
-            foreach (float distance in horizontalDistances)
-            {
+                float distance = i == numTiles ? distanceX % (Vestige.TILESIZE - 1) : (Vestige.TILESIZE - 1);
                 horizontalCollisionDirection = HorizontalCollisionPass(entity, distance, minPos, maxPos);
                 if (horizontalCollisionDirection != 0)
                 {
@@ -190,18 +186,11 @@ namespace Vestige.Game.Entities
             }
 
             //vertical tile collisions
-            //An entity can move at max 16 pixels at a time, to ensure a tile collision isn't skipped if the entity was moving to fast
-            //TODO: remove the list, make this more efficient
-            distanceFactor = (int)Math.Min(entity.Size.Y, Vestige.TILESIZE);
             float distanceY = entity.Velocity.Y * (float)delta;
-            List<float> verticalDistances = new List<float>();
-            for (int _ = 0; _ < Math.Floor(distanceY / distanceFactor); _++)
+            numTiles = (int)Math.Floor(Math.Abs(distanceY) / Vestige.TILESIZE);
+            for (int i = 0; i < numTiles + 1; i++)
             {
-                verticalDistances.Add(distanceFactor);
-            }
-            verticalDistances.Add(distanceY % distanceFactor);
-            foreach (float distance in verticalDistances)
-            {
+                float distance = i == numTiles ? distanceY % Vestige.TILESIZE : Vestige.TILESIZE;
                 if (VerticalCollisionPass(entity, distance, minPos, maxPos))
                 {
                     break;
@@ -221,9 +210,13 @@ namespace Vestige.Game.Entities
                     entity.Velocity.X = 0.0f;
                 }
             }
+
+            //Resolve liquid collisions
+            LiquidCollisionPass(entity);
         }
 
         //TODO: find a better solution than this, this is terrible
+        //EDIT: It's good enough
         public bool TileOccupied(int x, int y)
         {
             CollisionRectangle tile = new CollisionRectangle(x * Vestige.TILESIZE, y * Vestige.TILESIZE, Vestige.TILESIZE, Vestige.TILESIZE);
@@ -308,11 +301,6 @@ namespace Vestige.Game.Entities
             int endX = (int)Math.Ceiling(entityBounds.Right / Vestige.TILESIZE);
             int startY = (int)entityBounds.Top / Vestige.TILESIZE;
             int endY = (int)Math.Ceiling(entityBounds.Bottom / Vestige.TILESIZE);
-            //TODO: water
-            /*
-             Resolve collisions first, cache water tiles, check collisions after, so colliding with a floor and a water tile will not register as a water collision, since you're hitting a floor.
-             
-             */
             for (int x = startX; x <= endX; x++)
             {
                 for (int y = startY; y <= endY; y++)
@@ -358,6 +346,34 @@ namespace Vestige.Game.Entities
             entity.IsOnFloor = floorCollision;
             entity.IsOnCeiling = ceilingCollision;
             return collisionDetected;
+        }
+        private void LiquidCollisionPass(Entity entity)
+        {
+            //TODO: to fix water level collisions (NPC should not detect water collision if water is in the tile it's colliding with but the water line is lower than the bottom of the entity)
+            //Create a collision rectangle of the water (Size of the water sprite, and position of the water sprite) skip it if the entity and water are not colliding
+            Vector2 initialPosition = entity.Position;
+
+            CollisionRectangle entityBounds = entity.GetBounds();
+            int startX = (int)entityBounds.Left / Vestige.TILESIZE;
+            int endX = (int)Math.Ceiling(entityBounds.Right / Vestige.TILESIZE);
+            int startY = (int)entityBounds.Top / Vestige.TILESIZE;
+            int endY = (int)Math.Ceiling(entityBounds.Bottom / Vestige.TILESIZE);
+            for (int x = startX; x <= endX; x++)
+            {
+                for (int y = startY; y <= endY; y++)
+                {
+                    CollisionRectangle tileCollider = new CollisionRectangle(x * Vestige.TILESIZE, y * Vestige.TILESIZE, Vestige.TILESIZE, Vestige.TILESIZE);
+                    if (entityBounds.Intersects(tileCollider))
+                    {
+                        if (Main.World.GetLiquid(x, y) != 0)
+                        {
+                            //No liquid IDs implemented yet
+                            entity.OnLiquidCollision(x, y, 0);
+                            break;
+                        }
+                    }
+                }
+            }
         }
         float GetPenetrationX(CollisionRectangle a, CollisionRectangle b)
         {

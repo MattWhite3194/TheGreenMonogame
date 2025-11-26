@@ -41,18 +41,8 @@ namespace Vestige.Game.Entities
             _hitboxSize = hitboxSize != default ? hitboxSize : Size.ToPoint();
             _hitboxCenter = Origin - (_hitboxSize.ToVector2() / 2.0f);
         }
-        public virtual void OnCollision(Entity entity)
-        {
-
-        }
-        public virtual void OnTileCollision(int x, int y, ushort tileID)
-        {
-            //TODO: call this method
-        }
-        public virtual void OnLiquidCollision(int x, int y, ushort liquidID)
-        {
-            //TODO: call this method
-        }
+        public virtual void OnCollision(Entity entity) { }
+        public virtual void OnLiquidCollision(int x, int y, ushort liquidID) { }
         public virtual CollisionRectangle GetBounds()
         {
             return new CollisionRectangle(Position + _hitboxCenter, _hitboxSize);

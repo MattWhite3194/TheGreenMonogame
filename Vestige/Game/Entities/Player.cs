@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using Vestige.Game.Entities.NPCs;
 using Vestige.Game.Entities.Projectiles;
 using Vestige.Game.Input;
@@ -13,7 +14,7 @@ namespace Vestige.Game.Entities
 {
     public class Player : Entity, IInputHandler, IRespawnable
     {
-        private float _acceleration = 350;
+        private float _acceleration = 350.0f;
         public Vector2 Direction = Vector2.Zero;
         private int _maxSpeed = 150;
         private int _maxFallSpeed = 900;
@@ -28,6 +29,14 @@ namespace Vestige.Game.Entities
         private float _maxInvincibilityTime = 0.5f;
         private float _respawnTimeLeft;
         private float _maxRespawnTime = 8f;
+        //Liquid movement speed
+        private bool _collidingWithWater = false;
+        private bool _inWater = false;
+        private int _maxWaterSpeed = 80;
+        private float _waterAcceleration = 200.0f;
+        private int _waterJumpVelocity = -200;
+        private int _maxWaterFallSpeed = 250;
+        private float _waterGravity = 500.0f;
         float IRespawnable.RespawnTime
         {
             get
@@ -119,6 +128,27 @@ namespace Vestige.Game.Entities
 
         public override void Update(double delta)
         {
+            int maxSpeed = _maxSpeed;
+            float acceleration = _acceleration;
+            int jumpVelocity = _jumpVelocity;
+            int maxFallSpeed = _maxFallSpeed;
+            float gravity = Vestige.GRAVITY;
+            if (_collidingWithWater)
+            {
+                maxSpeed = _maxWaterSpeed;
+                acceleration = _waterAcceleration;
+                jumpVelocity = _waterJumpVelocity;
+                maxFallSpeed = _maxWaterFallSpeed;
+                gravity = _waterGravity;
+            }
+            //_colliding with water determines if the player has collided with a water tile during this frame update
+            //_inWater determines if the player is in a body of water
+            if (_collidingWithWater != _inWater)
+            {
+                _inWater = _collidingWithWater;
+                Debug.WriteLine("Splash");
+            }
+
             if (_invincible)
             {
                 _invincibilityTimeLeft -= (float)delta;
@@ -137,31 +167,31 @@ namespace Vestige.Game.Entities
             }
             if (Direction.X == 0.0f)
             {
-                newVelocity.X -= MathF.Sign(newVelocity.X) * (_acceleration * 2.0f) * (float)delta;
+                newVelocity.X -= MathF.Sign(newVelocity.X) * (acceleration * 2.0f) * (float)delta;
                 if (MathF.Sign(newVelocity.X) != 0 && MathF.Sign(newVelocity.X) != MathF.Sign(Velocity.X))
                     newVelocity.X = 0;
             }
             else
             {
                 if ((int)Direction.X != MathF.Sign(Velocity.X))
-                    newVelocity.X += Direction.X * (_acceleration * 2.0f) * (float)delta;
+                    newVelocity.X += Direction.X * (acceleration * 2.0f) * (float)delta;
                 else
-                    newVelocity.X += Direction.X * _acceleration * (float)delta;
-                if (MathF.Abs(newVelocity.X) > _maxSpeed)
-                    newVelocity.X = Math.Sign(newVelocity.X) * _maxSpeed;
+                    newVelocity.X += Direction.X * acceleration * (float)delta;
+                if (MathF.Abs(newVelocity.X) > maxSpeed)
+                    newVelocity.X = Math.Sign(newVelocity.X) * maxSpeed;
             }
 
             //add gravity
-            newVelocity.Y += Vestige.GRAVITY * (float)delta;
-            if (newVelocity.Y > _maxFallSpeed)
-                newVelocity.Y = _maxFallSpeed;
+            newVelocity.Y += gravity * (float)delta;
+            if (newVelocity.Y > maxFallSpeed)
+                newVelocity.Y = maxFallSpeed;
 
             //calculate fall damage and jump
             if (IsOnFloor)
             {
                 Direction.Y = 0;
                 //if the player falls for 10 tiles or more, take damage
-                if (_fallDistance / Vestige.TILESIZE > 10)
+                if (_fallDistance / Vestige.TILESIZE > 10 && !_collidingWithWater)
                 {
                     ApplyDamage(((int)(_fallDistance / Vestige.TILESIZE) - 10) * 2);
 
@@ -169,7 +199,7 @@ namespace Vestige.Game.Entities
                 _fallDistance = 0;
                 if (_queueJump)
                 {
-                    newVelocity.Y = _jumpVelocity;
+                    newVelocity.Y = jumpVelocity;
                     _queueJump = false;
                 }
             }
@@ -198,6 +228,7 @@ namespace Vestige.Game.Entities
             }
 
             Velocity = newVelocity;
+            _collidingWithWater = false;
             base.Update(delta);
         }
 
@@ -247,6 +278,11 @@ namespace Vestige.Game.Entities
                 ApplyDamage(projectile.Damage);
                 ApplyKnockback(projectile.Position + projectile.Origin);
             }
+        }
+
+        public override void OnLiquidCollision(int x, int y, ushort liquidID)
+        {
+            _collidingWithWater = true;
         }
         public void ApplyDamage(int damage)
         {

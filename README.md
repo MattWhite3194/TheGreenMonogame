@@ -2,7 +2,7 @@
 ![alt text](Vestige/VestigeProgressPhotos/Cover.png?raw=true)
 
 ## About
-Vestige is a 2D sandbox game where players can build, fight, and explore a fully destructable, procedurally generated tile world.  
+Vestige is a 2D sandbox game where players can build, fight, and explore a fully destructable, procedurally/randomly generated tile world.  
 
 ## Technical
 Vestige was built using the open-source Monogame framework, which is a reimplementation of Microsoft's XNA game framework.   
@@ -100,7 +100,22 @@ Collisions are filtered by layers.
 Example: An entity that collides with collision layer player will recieve collision events oly from entities with a layer value of Player.  
 
 ### UI System
+Implemented a Component/Container based UI system that's easily scalable.  
+Added a full anchor system  
+Components include: Label, Button, Textbox, Slider, as well as any kind of custom UI component via extending the UIComponent class  
+Containers include: Dropdowns, Grids, Panels, ScrollContainers, SelectionContainers, and any customizable container.  
 
 ### Crafting System
+![alt text](Vestige/VestigeProgressPhotos/Crafting1.png?raw=true)
+![alt text](Vestige/VestigeProgressPhotos/Crafting2.png?raw=true)
+![alt text](Vestige/VestigeProgressPhotos/Crafting3.png?raw=true)  
+A full crafting system with dynamic recipes has been implemented.  
+Shapeless recipes are on the TODO list, but will be quick to implement with the current system.
 
 ### Shell / Terminal
+![alt text](Vestige/VestigeProgressPhotos/Terminal.gif?raw=true)  
+A command prompt and chatbox has been added to the game, which can be accessed by pressing '~' in-game.  
+Commands include:  
+```/summon <enemyID> <X> <Y>``` - Summons an entity at the (x, y) position in the world.  
+```/item <id> <playerName> --quantity``` - gives the specified item to the player with the given name. Quantity is optional.  
+```/position <playerName>``` - prints the position of the player to the terminal.

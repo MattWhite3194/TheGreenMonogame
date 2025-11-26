@@ -71,16 +71,40 @@ namespace Vestige.Game.WorldGeneration
 
             _generationStatus = "Generating Terrain";
             //place stone and get surface height
+            int fullHillsDistance = WorldSize.X / 12;
+            int hillStartDistance = WorldSize.X / 16;
+            int fullMountainsDistance = WorldSize.X / 3;
+            int mountainStartDistance = WorldSize.X / 4;
+
+            float plainsHeight = 10.0f;
+            float hillsHeight = 80.0f;
+            float mountainsHeight = 130.0f;
             for (int i = 0; i < WorldSize.X; i++)
             {
-                //The gradient that scaled noise values based on their position in the world
-                float surfaceGradient = 1.0f;
-                int surfaceNoise = (int)(PerlinNoiseAt(i, 300.0, 4, 0.5) * 50.0 * surfaceGradient);
-                for (int j = (WorldSize.Y / 2) - (WorldSize.Y / 4) + surfaceNoise; j < WorldSize.Y; j++)
+                int distanceFromCenter = Math.Abs(i - WorldSize.X / 2);
+                //plains
+                int plainsNoise = (int)(PerlinNoiseAt(i, 50.0, 3, 0.5) * plainsHeight);
+                //hills - stretch from 1/12th of the world from the center to the edge
+                float hillGradient = 1.0f;
+                if (distanceFromCenter < fullHillsDistance)
+                {
+                    hillGradient = Math.Max(0, distanceFromCenter - hillStartDistance) / (float)( fullHillsDistance - hillStartDistance);
+                }
+                int hillNoise = (int)(PerlinNoiseAt(i, 300.0, 6, 0.5) * hillsHeight * hillGradient);
+                //mountains - stretch from 1/3rd of the worlds width from the center to the edge
+                float mountainGradient = 1.0f;
+                if (distanceFromCenter < fullMountainsDistance)
+                {
+                    mountainGradient = Math.Max(0, distanceFromCenter - mountainStartDistance) / (float)(fullMountainsDistance - mountainStartDistance);
+                }
+                int mountainsNoise = (int)(PerlinNoiseAt(i, 500.0, 3, 0.5) * mountainsHeight * mountainGradient);
+                //total height
+                int height = plainsNoise + hillNoise + mountainsNoise;
+                for (int j = (WorldSize.Y / 2) - (WorldSize.Y / 4) + height; j < WorldSize.Y; j++)
                 {
                     SetTile(i, j, 4);
                     SetWall(i, j, 2);
-                    surfaceTerrain[i] = (WorldSize.Y / 2) - (WorldSize.Y / 4) + surfaceNoise;
+                    surfaceTerrain[i] = (WorldSize.Y / 2) - (WorldSize.Y / 4) + height;
 
                     if (WorldSize.Y - surfaceTerrain[i] < _surfaceHeight)
                         _surfaceHeight = WorldSize.Y - surfaceTerrain[i];

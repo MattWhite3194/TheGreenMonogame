@@ -11,9 +11,7 @@ namespace Vestige.Game.WorldGeneration.WorldUpdaters
         private Queue<Point> _liquidUpdateQueue = new Queue<Point>();
         private HashSet<Point> _liquidTiles = new HashSet<Point>();
 
-        public LiquidUpdater(WorldGen world, double updateRate) : base(world, updateRate)
-        {
-        }
+        public LiquidUpdater(WorldGen world, double updateRate) : base(world, updateRate) { }
 
         public void SettleAll()
         {
@@ -77,15 +75,12 @@ namespace Vestige.Game.WorldGeneration.WorldUpdaters
                     left++;
                 }
                 int averageLiquid = (int)Math.Round((float)totalLiquid / (left + right + 1));
-                int numNotChanged = 0;
                 for (int i = -left; i <= right; i++)
                 {
                     if (i == 0)
                         continue;
                     if (world.GetLiquid(x + i, y) != averageLiquid)
                         world.SetLiquid(x + i, y, (byte)averageLiquid, true);
-                    else
-                        numNotChanged++;
                 }
                 if (averageLiquid == WorldGen.MaxLiquid - 1 && world.GetLiquid(x, y) == WorldGen.MaxLiquid)
                 {

@@ -44,7 +44,7 @@ namespace Vestige.Game.Entities.Projectiles
                 OnDeath();
             }
         }
-        public override void OnTileCollision(int x, int y, ushort tileID)
+        public void OnTileCollision(int x, int y, ushort tileID)
         {
             if (_tilePenetration == -1)
                 return;
